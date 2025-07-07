@@ -62,7 +62,7 @@ export default function Spreadsheet() {
   const [customColumnData, setCustomColumnData] = useState<CustomColumnData>({})
   const [searchTerm, setSearchTerm] = useState('')
   const [showDropdown, setShowDropdown] = useState<{row: number, col: string} | null>(null)
-  const [visibleRows, setVisibleRows] = useState(22)
+  const [visibleRows, setVisibleRows] = useState(40)
   const [maxRows] = useState(20000)
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
@@ -620,7 +620,7 @@ export default function Spreadsheet() {
           {/* Table Body */}
           <div>
             {/* Data rows */}
-            {filteredData.map((item, rowIndex) => (
+            {filteredData.slice(0, Math.min(visibleRows, maxRows)).map((item: JobRequest, rowIndex: number) => (
               <div 
                 key={item.id} 
                 className="flex hover:bg-gray-50 border-b border-gray-200"
@@ -658,7 +658,7 @@ export default function Spreadsheet() {
                             value={item.status}
                             onChange={(e) => handleDropdownSelect(rowIndex, column.key, e.target.value)}
                             onBlur={() => setShowDropdown(null)}
-                            className={`w-full text-xs font-medium rounded-full border px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 ${statusColors[item.status]}`}
+                            className={`w-full text-xs font-medium rounded-full border px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 ${statusColors[item.status as keyof typeof statusColors]}`}
                             autoFocus
                           >
                             {statusOptions.map(option => (
@@ -666,7 +666,7 @@ export default function Spreadsheet() {
                             ))}
                           </select>
                         ) : (
-                          <span className={`inline-flex px-1.5 py-0.5 text-xs font-medium rounded-full border ${statusColors[item.status]}`}>
+                          <span className={`inline-flex px-1.5 py-0.5 text-xs font-medium rounded-full border ${statusColors[item.status as keyof typeof statusColors]}`}>
                             {item.status}
                           </span>
                         )
@@ -676,7 +676,7 @@ export default function Spreadsheet() {
                             value={item.priority}
                             onChange={(e) => handleDropdownSelect(rowIndex, column.key, e.target.value)}
                             onBlur={() => setShowDropdown(null)}
-                            className={`w-full text-xs font-medium bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 ${priorityColors[item.priority]}`}
+                            className={`w-full text-xs font-medium bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 ${priorityColors[item.priority as keyof typeof priorityColors]}`}
                             autoFocus
                           >
                             {priorityOptions.map(option => (
@@ -684,7 +684,7 @@ export default function Spreadsheet() {
                             ))}
                           </select>
                         ) : (
-                          <span className={`text-xs font-medium ${priorityColors[item.priority]}`}>
+                          <span className={`text-xs font-medium ${priorityColors[item.priority as keyof typeof priorityColors]}`}>
                             {item.priority}
                           </span>
                         )
@@ -747,7 +747,7 @@ export default function Spreadsheet() {
             ))}
             
             {/* Empty rows for spreadsheet experience */}
-            {Array.from({ length: Math.max(0, visibleRows - filteredData.length) }).map((_, index) => {
+            {Array.from({ length: Math.max(0, Math.min(visibleRows, maxRows) - filteredData.length) }).map((_, index: number) => {
               const actualRowIndex = filteredData.length + index
               return (
                 <div 
