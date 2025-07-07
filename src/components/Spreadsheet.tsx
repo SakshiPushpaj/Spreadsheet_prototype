@@ -69,7 +69,61 @@ export default function Spreadsheet() {
 
   // Tab management with separate data for each tab
   const [tabs, setTabs] = useState([
-    { id: 'all-orders', name: 'All Orders', color: 'green', data: [] as JobRequest[] },
+    {
+      id: 'all-orders',
+      name: 'All Orders',
+      color: 'green',
+      data: [
+        {
+          id: 2,
+          jobRequest: 'Update press kit for company redesign',
+          submitted: '28-10-2024',
+          status: 'Need to start',
+          submitter: 'Irfan Khan',
+          url: 'www.irfankhan.com',
+          assigned: 'Tejas Pandey',
+          priority: 'High',
+          dueDate: '30-10-2024',
+          estValue: '3,500,000'
+        },
+        {
+          id: 3,
+          jobRequest: 'Finalize user testing feedback for app...',
+          submitted: '05-12-2024',
+          status: 'In-process',
+          submitter: 'Mark Johnson',
+          url: 'www.markjohnson.com',
+          assigned: 'Rachel Lee',
+          priority: 'Medium',
+          dueDate: '10-12-2024',
+          estValue: '4,750,000'
+        },
+        {
+          id: 4,
+          jobRequest: 'Design new features for the website',
+          submitted: '10-01-2025',
+          status: 'Complete',
+          submitter: 'Emily Green',
+          url: 'www.emilygreen.com',
+          assigned: 'Tom Wright',
+          priority: 'Low',
+          dueDate: '15-01-2025',
+          estValue: '5,900,000'
+        },
+        {
+          id: 5,
+          jobRequest: 'Prepare financial report for Q4',
+          submitted: '25-01-2025',
+          status: 'Blocked',
+          submitter: 'Jessica Brown',
+          url: 'www.jessicabrown.com',
+          assigned: 'Kevin Smith',
+          priority: 'Low',
+          dueDate: '30-01-2025',
+          estValue: '2,800,000'
+        }
+      ] as JobRequest[]
+    },
     { id: 'pending', name: 'Pending', color: 'yellow', data: [] as JobRequest[] },
     { id: 'reviewed', name: 'Reviewed', color: 'green', data: [] as JobRequest[] },
     { id: 'arrived', name: 'Arrived', color: 'purple', data: [] as JobRequest[] }
@@ -311,7 +365,35 @@ export default function Spreadsheet() {
   }
 
   const handleExport = () => {
-    console.log('Export clicked')
+    // Get current tab data
+    const currentTab = tabs.find(tab => tab.id === activeTabId)
+    const data = currentTab?.data || []
+    // Get visible columns
+    const visibleColumns = columns.filter(col => !hiddenFields.includes(col.key))
+    // CSV header
+    const header = visibleColumns.map(col => col.label).join(',')
+    // CSV rows
+    const rows = data.map(row =>
+      visibleColumns.map(col => {
+        // Escape quotes and commas
+        const value = (row as any)[col.key] || ''
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"')))
+          return '"' + value.replace(/"/g, '""') + '"'
+        return value
+      }).join(',')
+    )
+    // Combine header and rows
+    const csvContent = [header, ...rows].join('\r\n')
+    // Create blob and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = (currentTab?.name || 'sheet') + '.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const handleShare = () => {
@@ -343,7 +425,13 @@ export default function Spreadsheet() {
   }
 
   const handleSectionMenu = (section: string) => {
-    console.log(`Section menu clicked for: ${section}`)
+    if (section === 'New Section') {
+      // Delete all columns in 'New Section'
+      setColumns(columns.filter(col => col.section !== 'New Section'))
+    } else {
+      // Optionally, handle other section menus here
+      console.log(`Section menu clicked for: ${section}`)
+    }
   }
 
   const handleColumnHeaderClick = (colIndex: number) => {

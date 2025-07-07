@@ -68,3 +68,38 @@ export default tseslint.config([
 ])
 ```
 # Spreadsheet_prototype
+
+# Sheet-Clone
+
+A modern, spreadsheet-like web app built with React.
+
+## Features
+- Spreadsheet UI with editable cells, sections, and tabs
+- Infinite scroll up to 20,000 rows
+- CSV export (client-side)
+- Add, rename, and delete columns/sections
+- No backend required (all data in memory)
+
+## Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+2. **Run the app locally:**
+   ```bash
+   npm start
+   ```
+3. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+## Trade-offs
+- **Client-side only:** All data is stored in memory; refreshing the page will reset the sheet.
+- **CSV Export:** Export is done on the client, so very large sheets may be slow to download.
+- **No backend/database:** No persistent storage or multi-user collaboration.
+- **Performance:** Optimized for up to 20,000 rows, but performance may degrade with very large or complex sheets.
+
+---
+For questions or contributions, open an issue or pull request.
